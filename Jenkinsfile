@@ -5,10 +5,10 @@ pipeline {
         stage('Build Contracts') {
             steps {
                 dir('events-contract') {
-                    sh 'mvn clean install -DskipTests'
+                    sh './.mvnw clean install -DskipTests'
                 }
                 dir('car-rental-api') {
-                    sh 'mvn clean install -DskipTests'
+                    sh './.mvnw clean install -DskipTests'
                 }
             }
         }
@@ -18,24 +18,33 @@ pipeline {
                 stage('Build car-rental') {
                     steps {
                         dir('car-rental') {
-                            sh 'mvn clean package -DskipTests'
+                            sh './.mvnw clean package -DskipTests'
+                        }
+                    }
+                }
+
+                stage('Build analytics-service') {
+                    steps {
+                        dir('analytics-service') {
+                            sh './.mvnw clean package -DskipTests'
                         }
                     }
                 }
                 stage('Build notification-service') {
                     steps {
                         dir('notification-service') {
-                            sh 'mvn clean package -DskipTests'
+                            sh './.mvnw clean package -DskipTests'
                         }
                     }
                 }
                 stage('Build grpc-pricing') {
                     steps {
                         dir('grpc-pricing') {
-                            sh 'mvn clean package -DskipTests'
+                            sh './.mvnw clean package -DskipTests'
                         }
                     }
                 }
+            
             }
         }
         
