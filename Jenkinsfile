@@ -2,19 +2,7 @@ pipeline {
     agent any
     
     stages {
-        stage('Setup Docker Compose') {
-            steps {
-                sh '''
-                    if ! command -v docker-compose &> /dev/null; then
-                        curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
-                            -o /usr/bin/docker-compose
-                        chmod +x /usr/bin/docker-compose
-                    fi
-                '''
-            }
-        }
-
-        
+       
         stage('Build') {
             parallel {
                 stage('events-contract') {
@@ -65,7 +53,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                    docker-compose build --no-cache car-rental notification-service grpc-pricing analytics-service
+                    docker compose build car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
@@ -73,9 +61,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    docker-compose stop car-rental notification-service grpc-pricing analytics-service || true
-                    docker-compose up -d car-rental notification-service grpc-pricing analytics-service
-                    sleep 30
+                    docker compose down
+                    docker compose up -d car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
@@ -88,7 +75,7 @@ pipeline {
         }
         failure {
             echo 'Build failed'
-            sh 'docker-compose logs --tail=20'
+            sh 'docker compose logs --tail=20'
         }
     }
 }
