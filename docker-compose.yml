@@ -62,7 +62,7 @@ services:
       - prometheus
 
   jenkins:
-    image: jenkins/jenkins:lts
+    image: jenkins/jenkins:lts-jdk21
     container_name: jenkins-ci
     user: root
     ports:
@@ -70,7 +70,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_home:/var/jenkins_home
-      - ./:/workspace
+    
+      - ../car-rental-app:/workspace 
     environment:
       JAVA_OPTS: -Djenkins.install.runSetupWizard=false
     networks:
