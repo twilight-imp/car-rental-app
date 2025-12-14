@@ -53,7 +53,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                    docker-compose build car-rental notification-service grpc-pricing analytics-service
+                    docker compose build car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
@@ -61,8 +61,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    docker-compose down
-                    docker-compose up -d car-rental notification-service grpc-pricing analytics-service
+                    docker compose down
+                    docker compose up -d car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
@@ -75,7 +75,7 @@ pipeline {
         }
         failure {
             echo 'Build failed'
-            sh 'docker-compose logs | tail -n 20'
+            sh 'docker compose logs | tail -n 20'
         }
     }
 }
