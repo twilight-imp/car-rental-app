@@ -71,11 +71,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
       - jenkins_home:/var/jenkins_home
-      - ./:/workspace
     environment:
       JAVA_OPTS: -Djenkins.install.runSetupWizard=false
     networks:
       - microservices-net
+
 
   analytics-service:
     build: ./analytics-service
