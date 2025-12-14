@@ -1,0 +1,98 @@
+type Car {
+    id: ID!
+    brand: String!
+    model: String!
+    year: Int
+    color: String
+    registrationPlate: String
+    minDailyPrice: Int
+    available: Boolean!
+    bookings: [Booking]
+}
+
+type Customer {
+    id: ID!
+    name: String
+    lastname: String
+    birthday: String
+    drivingExperience: Int
+    email: String
+    phone: String
+    bookings: [Booking]
+}
+
+type Payment{
+    id: ID!
+    amount: Float!
+    paymentMethod: String!
+    createdAt: String!
+}
+
+type Booking {
+    id: ID!
+    car: Car!
+    customer: Customer!
+    startDate: String!
+    endDate: String!
+    totalPrice: Float
+    status: String!
+    createdAt: String!
+    payment: Payment
+}
+
+type CarPage {
+    content: [Car]
+    pageNumber: Int
+    pageSize: Int
+    totalElements: Int
+    totalPages: Int
+    last: Boolean
+}
+
+type Query {
+    cars(
+        brand: String,
+        model: String,
+        year: Int,
+        color: String,
+        available: Boolean,
+        page: Int = 0,
+        size: Int = 10
+    ): CarPage
+
+    carById(id: ID!): Car
+
+    customers: [Customer]
+
+    customerById(id: ID!): Customer
+
+    bookings: [Booking]
+
+    bookingById(id: ID!): Booking
+
+    bookingsByCustomerId(customerId: ID!): [Booking]
+
+    bookingsByCarId(carId: ID!): [Booking]
+}
+
+input BookingInput {
+    carId: ID!
+    customerId: ID!
+    startDate: String!
+    endDate: String!
+}
+
+input PaymentInput {
+    amount: Float!
+    paymentMethod: String!
+}
+
+type Mutation {
+    createBooking(input: BookingInput!): Booking
+    cancelBooking(id: ID!): Booking
+    payBooking(id: ID!, payment: PaymentInput!): Booking
+}
+
+
+
+

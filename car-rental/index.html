@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Rental Notifications</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+               background-color: #f4f4f9; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; 
+                    padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        #status { text-align: center; margin-bottom: 20px; font-weight: bold; color: #dc3545; }
+        .notification { padding: 15px; margin-bottom: 10px; border-left: 5px solid; border-radius: 4px; 
+                       animation: slideIn 0.5s ease-out; }
+        .BOOKING_CREATED { background-color: #d4edda; border-color: #28a745; color: #155724; }
+        .BOOKING_CANCELLED { background-color: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .BOOKING_PAID { background-color: #fff3cd; border-color: #ffc107; color: #856404; }
+        .PRICE_CALCULATED { background-color: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } 
+                            to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Car Rental Notification Center</h2>
+        <div id="status">Отключено</div>
+        <div id="notifications-area"></div>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const area = document.getElementById('notifications-area');
+        let socket;
+
+        function connect() {
+            // Подключение к нашему новому сервису
+            socket = new WebSocket('ws://localhost:8083/ws/notifications');
+
+            socket.onopen = () => {
+                statusDiv.innerText = 'Подключено к системе событий';
+                statusDiv.style.color = '#28a745';
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log("Получено событие:", data);
+
+              
+                if (['BOOKING_CREATED', 'BOOKING_CANCELLED', 'BOOKING_PAID', 'PRICE_CALCULATED'].includes(data.type)) {
+                    showNotification(data);
+                }
+            };
+
+            socket.onclose = () => {
+                statusDiv.innerText = 'Соединение разорвано. Переподключение...';
+                statusDiv.style.color = '#dc3545';
+                setTimeout(connect, 3000);
+            };
+        }
+
+        function showNotification(data) {
+            const div = document.createElement('div');
+            div.className = `notification ${data.type}`;
+            
+ 
+            if (data.type === 'BOOKING_CREATED') {
+                div.innerHTML = `
+                    <strong>Новая бронь создана</strong><br>
+                    Booking ID: <b>${data.bookingId}</b><br>
+                    Car ID: ${data.carId || 'Не указан'}<br>
+                    Customer ID: ${data.customerId || 'Не указан'}
+                `;
+            }
+            else if (data.type === 'BOOKING_CANCELLED') {
+                div.innerHTML = `
+                    <strong>Бронь отменена</strong><br>
+                    Booking ID: <b>${data.bookingId}</b><br>
+                    Время отмены: ${data.date || 'Только что'}
+                `;
+            }
+            else if (data.type === 'BOOKING_PAID') {
+                div.innerHTML = `
+                    <strong>Бронь оплачена</strong><br>
+                    Booking ID: <b>${data.bookingId}</b><br>
+                    Сумма: <b>${data.amount || data.price} руб.</b><br>
+                    Метод: ${data.paymentMethod || 'Не указан'}
+                `;
+            }
+            else if (data.type === 'PRICE_CALCULATED') {
+                div.innerHTML = `
+                    <strong>Цена рассчитана</strong><br>
+                    Booking ID: <b>${data.bookingId}</b><br>
+                    Итоговая цена: <b>${data.price} руб.</b>
+                `;
+            }
+            
+            area.prepend(div);
+        }
+
+        connect();
+    </script>
+</body>
+</html>

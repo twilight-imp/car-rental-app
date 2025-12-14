@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "grpc.pricing";
+option java_outer_classname = "PricingServiceProto";
+
+service PricingService {
+    rpc CalculateTotalPrice(CalculatePriceRequest) returns (CalculatePriceResponse);
+}
+
+message CalculatePriceRequest {
+    double car_base_price = 1;
+    int32 rental_days = 2;
+    int32 customer_age = 3;
+    int32 driving_experience = 4;
+}
+
+message CalculatePriceResponse {
+  double base_total = 1;
+  double final_price = 2;
+}

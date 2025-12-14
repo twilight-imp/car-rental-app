@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'car-rental-apps'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+        - 'car-rental:8080'
+        - 'notification-service:8083'
+        - 'grpc-pricing:8081'
+        - 'analytics-service:8082'
