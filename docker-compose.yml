@@ -62,19 +62,15 @@ services:
       - prometheus
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk21
-    container_name: jenkins-ci
+    build: ./jenkins-dockerfile
     user: root
     ports:
-      - "8081:8080"
+      - "8088:8080"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_home:/var/jenkins_home
-    environment:
-      JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+      - /var/run/docker.sock:/var/run/docker.sock 
     networks:
       - microservices-net
-
 
 
   analytics-service:
