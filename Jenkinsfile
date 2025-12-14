@@ -78,3 +78,4 @@ pipeline {
             sh 'docker compose logs | tail -n 20'
         }
     }
+}
