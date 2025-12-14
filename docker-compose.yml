@@ -62,7 +62,7 @@ services:
       - prometheus
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk21
+    image: jenkins/jenkins:lts
     container_name: jenkins-ci
     ports:
       - "8081:8080"
