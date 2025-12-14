@@ -5,7 +5,7 @@ pipeline {
         stage('Build Contracts') {
             steps {
                 dir('events-contract') {
-                    sh './mvnw  clean install -DskipTests'
+                    sh './mvnw clean install -DskipTests'
                 }
                 dir('car-rental-api') {
                     sh './mvnw clean install -DskipTests'
