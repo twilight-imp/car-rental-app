@@ -63,7 +63,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    # Только пересоздаём и перезапускаем 4 сервиса
+            
+                    docker compose stop car-rental notification-service grpc-pricing analytics-service || true
+                    docker compose rm -f car-rental notification-service grpc-pricing analytics-service || true
+                    
+                
+                    sleep 5
+                    
                     docker compose up -d --force-recreate --no-deps car-rental notification-service grpc-pricing analytics-service
                 '''
             }
