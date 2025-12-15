@@ -56,21 +56,20 @@ pipeline {
         
         stage('Docker Build') {
             steps {
-                sh 'docker compose build --no-cache car-rental notification-service grpc-pricing analytics-service'
+                sh 'docker compose -p car-rental-project build --no-cache car-rental notification-service grpc-pricing analytics-service'
             }
         }
         
         stage('Deploy') {
             steps {
                 sh '''
-            
-                    docker compose stop car-rental notification-service grpc-pricing analytics-service || true
-                    docker compose rm -f car-rental notification-service grpc-pricing analytics-service || true
+                    # Используем то же имя проекта, что и снаружи
+                    docker compose -p car-rental-project stop car-rental notification-service grpc-pricing analytics-service || true
+                    docker compose -p car-rental-project rm -f car-rental notification-service grpc-pricing analytics-service || true
                     
-                
-                    sleep 5
+                    sleep 10
                     
-                    docker compose up -d --force-recreate --no-deps car-rental notification-service grpc-pricing analytics-service
+                    docker compose -p car-rental-project up -d --force-recreate --no-deps car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
