@@ -63,8 +63,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    docker compose down
-                    docker compose up -d car-rental notification-service grpc-pricing analytics-service
+                    docker compose down -v --remove-orphans || true
+
+                    docker compose up -d --force-recreate car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
