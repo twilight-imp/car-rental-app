@@ -67,6 +67,8 @@ pipeline {
 
                     docker ps -a --filter "name=car-rental-last_" --format "{{.ID}}" | xargs -r docker rm -f || true
 
+                    sleep 20
+
                     docker compose up -d --force-recreate car-rental notification-service grpc-pricing analytics-service
                 '''
             }
