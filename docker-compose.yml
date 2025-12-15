@@ -59,6 +59,8 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - prometheus
+    networks:
+      - microservices-net
 
   jenkins:
     build: ./jenkins-dockerfile
