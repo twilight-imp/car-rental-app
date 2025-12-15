@@ -56,20 +56,15 @@ pipeline {
         
         stage('Docker Build') {
             steps {
-                sh 'docker compose build car-rental notification-service grpc-pricing analytics-service'
+                sh 'docker compose build --no-cache car-rental notification-service grpc-pricing analytics-service'
             }
         }
         
         stage('Deploy') {
             steps {
                 sh '''
-                    docker compose down -v --remove-orphans || true
-
-                    docker ps -a --filter "name=car-rental-last_" --format "{{.ID}}" | xargs -r docker rm -f || true
-
-                    sleep 20
-
-                    docker compose up -d --force-recreate car-rental notification-service grpc-pricing analytics-service
+                    # Только пересоздаём и перезапускаем 4 сервиса
+                    docker compose up -d --force-recreate --no-deps car-rental notification-service grpc-pricing analytics-service
                 '''
             }
         }
