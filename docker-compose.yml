@@ -3,7 +3,6 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: car_rental_database
     restart: always
     environment:
       POSTGRES_DB: car_booking
