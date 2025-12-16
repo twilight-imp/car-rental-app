@@ -87,7 +87,9 @@ services:
       - microservices-net
 
   car-rental:
-    build: ./car-rental
+    build:
+      context: .
+      dockerfile: car-rental/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -103,7 +105,9 @@ services:
       - microservices-net
 
   grpc-pricing:
-    build: ./grpc-pricing
+    build:
+      context: .
+      dockerfile: grpc-pricing/Dockerfile
     ports:
       - "9090:9090"
     environment:
@@ -112,7 +116,9 @@ services:
       - microservices-net
 
   notification-service:
-    build: ./notification-service
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
     ports:
       - "8083:8083"
     environment:
