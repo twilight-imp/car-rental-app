@@ -75,7 +75,9 @@ services:
 
 
   analytics-service:
-    build: ./analytics-service
+    build:
+      context: .
+      dockerfile: analytics-service/Dockerfile
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SERVER_PORT=8082
