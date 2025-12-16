@@ -1,4 +1,3 @@
-@@
 # Stage 1: build JAR-ника
 FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
