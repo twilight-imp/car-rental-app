@@ -40,7 +40,6 @@ public class NotificationListener {
                 event.customerId()
         );
 
-        // Отправляем в браузер
         notificationHandler.broadcast(userMessage);
     }
 
@@ -83,7 +82,6 @@ public class NotificationListener {
         notificationHandler.broadcast(userMessage);
     }
 
-    // Дополнительно: слушаем события из fanout exchange
     @RabbitListener(
             bindings = @QueueBinding(
                     value = @Queue(name = "q.notifications.pricing", durable = "true"),

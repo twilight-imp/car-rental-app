@@ -16,6 +16,7 @@ import com.example.exception.InvalidBookingStatusException;
 import com.example.exception.ResourceNotFoundException;
 import grpc.pricing.CalculatePriceRequest;
 import grpc.pricing.PricingServiceGrpc;
+import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.events.BookingCancelledEvent;
 import org.example.events.BookingCreatedEvent;
@@ -139,12 +140,20 @@ public class BookingService {
         int rentalDays = Period.between(request.startDate(), request.endDate()).getDays() + 1;
 
         int age = Period.between(customer.getBirthday(), LocalDate.now()).getYears();
+        double price;
+        try {
+            var grpcRequest = CalculatePriceRequest.newBuilder()
+                    .setCarBasePrice(car.getMinDailyPrice())
+                    .setRentalDays(rentalDays)
+                    .setCustomerAge(age)
+                    .setDrivingExperience(customer.getDrivingExperience())
+                    .build();
+            var grpcResponse = pricingStub.calculateTotalPrice(grpcRequest);
+            price = grpcResponse.getFinalPrice();
 
-        var grpcRequest = CalculatePriceRequest.newBuilder().setCarBasePrice(car.getMinDailyPrice()).setRentalDays(rentalDays).setCustomerAge(age).setDrivingExperience(customer.getDrivingExperience()).build();
-
-        var grpcResponse = pricingStub.calculateTotalPrice(grpcRequest);
-
-        double price = grpcResponse.getFinalPrice();
+        } catch (StatusRuntimeException e) {
+            throw new ResourceNotFoundException("Сервис расчета цен", "недоступен");
+        }
 
         Booking booking = new Booking(car, customer, request.startDate(), request.endDate(), price);
 
@@ -152,8 +161,7 @@ public class BookingService {
         carRepository.update(car);
         Booking savedBooking = bookingRepository.create(booking);
 
-        // Отправка события в Fanout
-        var pricingEvent = new PriceCalculatedEvent(booking.getId(), grpcResponse.getFinalPrice());
+        var pricingEvent = new PriceCalculatedEvent(booking.getId(), price);
 
 
         rabbitTemplate.convertAndSend(RabbitMQConfig.FANOUT_EXCHANGE, "", pricingEvent);
@@ -251,14 +259,12 @@ public class BookingService {
         booking.setStatus(Status.CONFIRMED);
 
         Booking updatedBooking = bookingRepository.update(booking);
-
         BookingPaidEvent event = new BookingPaidEvent(
                 updatedBooking.getId(),
                 updatedBooking.getPayment().getAmount(),
                 updatedBooking.getPayment().getPaymentMethod().getDescription(),
                 updatedBooking.getPayment().getCreatedAt()
         );
-
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.EXCHANGE_NAME,
                 RabbitMQConfig.ROUTING_KEY_BOOKING_PAID,

@@ -13,10 +13,9 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.UUID;
 
-@Component
+//@Component
 @Order(1)
 public class LoggingAndTracingFilter implements Filter {
-
     private static final Logger log = LoggerFactory.getLogger(LoggingAndTracingFilter.class);
     private static final String CORRELATION_ID_HEADER = "X-Request-ID";
     private static final String CORRELATION_ID_MDC_KEY = "correlationId";
@@ -24,7 +23,6 @@ public class LoggingAndTracingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
@@ -32,22 +30,18 @@ public class LoggingAndTracingFilter implements Filter {
         if (!StringUtils.hasText(correlationId)) {
             correlationId = UUID.randomUUID().toString();
         }
-
         MDC.put(CORRELATION_ID_MDC_KEY, correlationId);
 
         response.setHeader(CORRELATION_ID_HEADER, correlationId);
 
         long startTime = System.currentTimeMillis();
 
-
         try {
             if(request.getRequestURI().startsWith("/api/")) log.info("Request started: {} {}", request.getMethod(), request.getRequestURI());
-
             filterChain.doFilter(request, response);
 
         } finally {
             long duration = System.currentTimeMillis() - startTime;
-
             if (request.getRequestURI().startsWith("/api/")) {
                 log.info("Request finished: {} {} with status {} in {}ms",
                         request.getMethod(), request.getRequestURI(), response.getStatus(), duration);

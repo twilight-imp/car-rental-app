@@ -27,7 +27,6 @@ public class RabbitMQConfig {
 
     @Bean
     public TopicExchange carRentalExchange() {
-        // durable=true - переживет перезагрузку брокера
         return new TopicExchange(EXCHANGE_NAME, true, false);
     }
 
@@ -41,8 +40,6 @@ public class RabbitMQConfig {
                                          Jackson2JsonMessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
-
-        // Гарантии доставки
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
             if (!ack) {
                 System.out.println("NACK: Message delivery failed! " + cause);
